@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, ScrollView } from 'react-native'; 
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, ScrollView } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useNavigation } from '@react-navigation/native';  // Importar useNavigation
+import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
 
 export default function FormularioRTI() {
   const [nombre, setNombre] = useState('');
@@ -12,7 +12,7 @@ export default function FormularioRTI() {
   const [tipoTutoria, setTipoTutoria] = useState('Ninguna');
   const [comentarios, setComentarios] = useState('');
 
-  const navigation = useNavigation();  // Obtener la instancia de navigation
+  const navigation = useNavigation(); // Obtener la instancia de navigation
 
   const handleSubmit = () => {
     // Lógica para manejar el envío del formulario
@@ -23,17 +23,17 @@ export default function FormularioRTI() {
       correo,
       matricula,
       tipoTutoria,
-      comentarios
+      comentarios,
     });
   };
 
   const handleAtras = () => {
-    navigation.navigate('Solicitudes');  // Usar navigation para navegar
+    navigation.navigate('Solicitudes'); // Usar navigation para navegar
   };
 
   return (
-    <ImageBackground 
-      source={require('./Imagenes/FondoPantalla.jpg')} 
+    <ImageBackground
+      source={require('./Imagenes/FondoPantalla2.jpg')}
       style={styles.background}
     >
       <View style={styles.overlay} />
@@ -41,15 +41,15 @@ export default function FormularioRTI() {
         {/* Encabezado */}
         <View style={styles.header}>
           <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
-            <Image 
+            <Image
               source={require('./Imagenes/atras.png')}
               style={styles.menuIcon}
             />
           </TouchableOpacity>
-          <Text style={styles.title}>Registro de Tutoría </Text>
+          <Text style={styles.title}>Registro de Tutoría</Text>
         </View>
         <ScrollView contentContainerStyle={styles.formContainer}>
-          <View style={styles.row}>
+          <View style={styles.form}>
             <TextInput
               style={styles.input}
               placeholder="Nombre"
@@ -68,41 +68,45 @@ export default function FormularioRTI() {
               value={apellidoMaterno}
               onChangeText={setApellidoMaterno}
             />
+            <TextInput
+              style={styles.input}
+              placeholder="Correo Electrónico"
+              value={correo}
+              onChangeText={setCorreo}
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Matrícula"
+              value={matricula}
+              onChangeText={setMatricula}
+            />
+            <View style={styles.pickerContainer}>
+              <Picker
+                selectedValue={tipoTutoria}
+                style={styles.picker}
+                onValueChange={(itemValue) => setTipoTutoria(itemValue)}
+              >
+                <Picker.Item label="Ninguna" value="Ninguna" />
+                <Picker.Item label="Solicitar Tutoría" value="SolicitarTutoría" />
+                <Picker.Item label="Solicitar Asesoría" value="TutoriaIndividual" />
+                <Picker.Item label="Solicitud de Baja" value="SolicituddeBaja" />
+                <Picker.Item label="Apoyo Información Becas y Trámites" value="ApoyoInformacionBecasyTramites" />
+                <Picker.Item label="Apoyo Servicios al Estudiante" value="ApoyoServiciosalEstudiante" />
+              </Picker>
+            </View>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Comentarios"
+              value={comentarios}
+              onChangeText={setComentarios}
+              multiline
+              numberOfLines={4}
+            />
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+              <Text style={styles.buttonText}>Registrar</Text>
+            </TouchableOpacity>
           </View>
-          <TextInput
-            style={styles.singleInput}
-            placeholder="Correo Electrónico"
-            value={correo}
-            onChangeText={setCorreo}
-            keyboardType="email-address"
-          />
-          <TextInput
-            style={styles.singleInput}
-            placeholder="Matrícula"
-            value={matricula}
-            onChangeText={setMatricula}
-          />
-          <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={tipoTutoria}
-              style={styles.picker}
-              onValueChange={(itemValue) => setTipoTutoria(itemValue)}
-            >
-              <Picker.Item label="Ninguna" value="Ninguna" />
-              <Picker.Item label="Tutoría Individual" value="TutoriaIndividual" />
-            </Picker>
-          </View>
-          <TextInput
-            style={styles.textArea}
-            placeholder="Comentarios"
-            value={comentarios}
-            onChangeText={setComentarios}
-            multiline
-            numberOfLines={4}
-          />
-          <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-            <Text style={styles.buttonText}>Registrar</Text>
-          </TouchableOpacity>
         </ScrollView>
       </View>
     </ImageBackground>
@@ -147,65 +151,45 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#990634', // Color de fondo actualizado
+    paddingVertical: 20,
+    paddingHorizontal: 30,
     justifyContent: 'center',
-    alignItems: 'center',
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
+  form: {
+    backgroundColor: 'rgba(255, 255, 255, 1.0)',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   input: {
-    flex: 1,
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
-    marginHorizontal: 5,
+    marginBottom: 15,
     paddingHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: 'white', // Para que el campo de texto sea visible con el nuevo fondo
-  },
-  singleInput: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    width: '100%',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: 'white', // Para que el campo de texto sea visible con el nuevo fondo
   },
   pickerContainer: {
-    height: 50,
-    width: '100%',
-    marginBottom: 20,
     borderColor: '#ccc',
     borderWidth: 1,
+    marginBottom: 15,
     borderRadius: 5,
-    backgroundColor: 'white', // Para que el Picker sea visible con el nuevo fondo
-    justifyContent: 'center',
   },
   picker: {
+    height: 40,
     width: '100%',
-    height: 50,
   },
   textArea: {
     height: 100,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    width: '100%',
-    marginBottom: 20,
-    paddingHorizontal: 10,
-    borderRadius: 5,
     textAlignVertical: 'top',
-    backgroundColor: 'white', // Para que el área de texto sea visible con el nuevo fondo
   },
   button: {
-    backgroundColor: '#20FF0D',
+    backgroundColor: '#62152D',
     paddingVertical: 15,
-    paddingHorizontal: 30,
     borderRadius: 10,
     alignItems: 'center',
   },

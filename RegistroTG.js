@@ -1,110 +1,209 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import CheckBox from '@react-native-community/checkbox';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image, } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
 
-const RegistroTG = () => {
+export default function RegistroTG() {
   const [carrera, setCarrera] = useState('');
   const [grupo, setGrupo] = useState('');
   const [tutor, setTutor] = useState('');
-  const [fechaSesion, setFechaSesion] = useState('');
+  const [cuatrimestre, setCuatrimestre] = useState('');
+  const [fechaSesion, setFechaSesion] = useState(new Date());
   const [tema, setTema] = useState('');
-  const [alumnos, setAlumnos] = useState([{ nombre: '', asistencia: false }]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [alumnos, setAlumnos] = useState([{ id: 1, nombre: '', asistencia: false }]);
+  const [riesgos, setRiesgos] = useState([{ academico: '', personal: '' }]);
 
-  const agregarFila = () => {
-    setAlumnos([...alumnos, { nombre: '', asistencia: false }]);
+  const navigation = useNavigation();
+
+  const handleFechaSesionChange = (event, selectedDate) => {
+    setShowDatePicker(false);
+    const currentDate = selectedDate || fechaSesion;
+    setFechaSesion(currentDate);
+  };
+
+  const handleAddFila = () => {
+    setAlumnos([...alumnos, { id: alumnos.length + 1, nombre: '', asistencia: false }]);
+  };
+
+  const handleAtras = () => {
+    navigation.navigate('Solicitudes');
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+
+    <View style={styles.container}>
+      {/* Encabezado */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.menuButton}>
-          <Text style={styles.menuIcon}>☰</Text>
+        <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
+          <Image 
+            source={require('./Imagenes/atras.png')}
+            style={styles.menuIcon}
+          />
         </TouchableOpacity>
         <Text style={styles.title}>Registro de T.G.</Text>
       </View>
 
-      <View style={styles.formGroup}>
-        <TextInput
-          placeholder="Carrera"
-          value={carrera}
-          onChangeText={setCarrera}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Grupo"
-          value={grupo}
-          onChangeText={setGrupo}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Tutor"
-          value={tutor}
-          onChangeText={setTutor}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Fecha de Sesión"
-          value={fechaSesion}
-          onChangeText={setFechaSesion}
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Tema"
-          value={tema}
-          onChangeText={setTema}
-          style={styles.input}
-        />
-      </View>
-
-      <View style={styles.tableContainer}>
-        <View style={styles.tableHeader}>
-          <Text style={styles.tableHeaderText}>Alumnos</Text>
-          <Text style={styles.tableHeaderText}>Asistencia</Text>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Formulario */}
+        <View style={styles.formContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Carrera"
+            value={carrera}
+            onChangeText={setCarrera}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Grupo"
+            value={grupo}
+            onChangeText={setGrupo}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Tutor"
+            value={tutor}
+            onChangeText={setTutor}
+          />
+          <TouchableOpacity
+            style={styles.input}
+            onPress={() => setShowDatePicker(true)}
+          >
+            <Text>{fechaSesion.toLocaleDateString()}</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={fechaSesion}
+              mode="date"
+              display="default"
+              onChange={handleFechaSesionChange}
+              style={styles.datePicker}
+            />
+          )}
+          <TextInput
+            style={styles.input}
+            placeholder="Tema"
+            value={tema}
+            onChangeText={setTema}
+          />
         </View>
-        {alumnos.map((alumno, index) => (
-          <View key={index} style={styles.tableRow}>
-            <TextInput
-              placeholder="Nombre del Alumno"
-              value={alumno.nombre}
-              onChangeText={(text) => {
-                const newAlumnos = [...alumnos];
-                newAlumnos[index].nombre = text;
-                setAlumnos(newAlumnos);
-              }}
-              style={styles.tableInput}
-            />
-            <CheckBox
-              value={alumno.asistencia}
-              onValueChange={(newValue) => {
-                const newAlumnos = [...alumnos];
-                newAlumnos[index].asistencia = newValue;
-                setAlumnos(newAlumnos);
-              }}
-              style={styles.checkBox}
-            />
+
+        {/* Tabla de Alumnos */}
+        <View style={styles.tableContainer}>
+          <View style={styles.tableHeader}>
+            <View style={[styles.columnHeader, { flex: 2 }]}>
+              <Text style={styles.headerText}>Nombre del Alumno</Text>
+            </View>
+            <View style={styles.columnHeader}>
+              <Text style={styles.headerText}>Asistencia</Text>
+            </View>
           </View>
-        ))}
-        <Button title="Agregar Alumno" onPress={agregarFila} style={styles.addButton} />
-      </View>
-    </ScrollView>
+          {alumnos.map((alumno, index) => (
+            <View key={alumno.id} style={styles.tableRow}>
+              <View style={[styles.tableCell, { flex: 2 }]}>
+                <TextInput
+                  style={styles.tableInput}
+                  placeholder="Nombre del Alumno"
+                  value={alumno.nombre}
+                  onChangeText={(text) => {
+                    const newAlumnos = [...alumnos];
+                    newAlumnos[index].nombre = text;
+                    setAlumnos(newAlumnos);
+                  }}
+                />
+              </View>
+              <View style={styles.checkboxContainer}>
+                <TouchableOpacity
+                  onPress={() => {
+                    const newAlumnos = [...alumnos];
+                    newAlumnos[index].asistencia = !newAlumnos[index].asistencia;
+                    setAlumnos(newAlumnos);
+                  }}
+                  style={[
+                    styles.checkbox,
+                    alumno.asistencia && styles.checkboxChecked,
+                  ]}
+                />
+              </View>
+            </View>
+          ))}
+          <TouchableOpacity style={styles.addButton} onPress={handleAddFila}>
+            <Text style={styles.addButtonText}>Agregar Fila</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Tabla de Riesgos */}
+        <View style={styles.tableContainer}>
+          <Text style={styles.riskHeader}>Total de alumnos que se detectaron en riesgo:</Text>
+          <View style={styles.tableHeader}>
+            <View style={styles.columnHeader}>
+              <Text style={styles.headerText}>Académico</Text>
+            </View>
+            <View style={styles.columnHeader}>
+              <Text style={styles.headerText}>Personal</Text>
+            </View>
+          </View>
+          <View style={styles.tableRow}>
+            <View style={styles.tableCell}>
+              <TextInput
+                style={styles.tableInput}
+                placeholder="Número Académico"
+                value={riesgos[0].academico}
+                onChangeText={(text) => {
+                  const newRiesgos = [...riesgos];
+                  newRiesgos[0].academico = text;
+                  setRiesgos(newRiesgos);
+                }}
+              />
+            </View>
+            <View style={styles.tableCell}>
+              <TextInput
+                style={styles.tableInput}
+                placeholder="Número Personal"
+                value={riesgos[0].personal}
+                onChangeText={(text) => {
+                  const newRiesgos = [...riesgos];
+                  newRiesgos[0].personal = text;
+                  setRiesgos(newRiesgos);
+                }}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Cuadros de Totales */}
+        <View style={styles.boxContainer}>
+          <View style={styles.box}>
+            <Text style={styles.boxHeader}>Total de alumnos que asistieron:</Text>
+            <TextInput style={styles.boxInput} placeholder="Número" />
+          </View>
+          <View style={styles.box}>
+            <Text style={styles.boxHeader}>Total de alumnos canalizados:</Text>
+            <TextInput style={styles.boxInput} placeholder="Número" />
+          </View>
+        </View>
+
+        {/* Botón de enviar */}
+        <TouchableOpacity style={styles.button} onPress={() => console.log('Enviar')}>
+          <Text style={styles.buttonText}>Enviar</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    padding: 20,
-    backgroundColor: '#990634', // Color de fondo actualizado
+    flex: 1,
+    backgroundColor: '#990634',
   },
   header: {
     backgroundColor: '#62152D',
-    width: '100%',
-    height: 70,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 20,
-    position: 'relative',
+    height: 70,
   },
   menuButton: {
     position: 'absolute',
@@ -114,16 +213,21 @@ const styles = StyleSheet.create({
   menuIcon: {
     width: 30,
     height: 30,
-    color: 'white',
-    fontSize: 30,
   },
   title: {
     color: 'white',
     fontSize: 22,
     fontWeight: 'bold',
   },
-  formGroup: {
+  scrollContent: {
+    flexGrow: 1,
+    padding: 20,
+  },
+  formContainer: {
+    backgroundColor: 'white',
+    padding: 20,
     marginBottom: 20,
+    borderRadius: 10,
   },
   input: {
     height: 40,
@@ -132,43 +236,118 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: 'white',
+    justifyContent: 'center',
+  },
+  datePicker: {
+    marginBottom: 10,
   },
   tableContainer: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 5,
     backgroundColor: 'white',
+    borderRadius: 10,
     padding: 10,
+    marginBottom: 20,
   },
   tableHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 10,
   },
-  tableHeaderText: {
+  columnHeader: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#000000',
+  },
+  headerText: {
     fontWeight: 'bold',
-    width: '40%',
+    textAlign: 'center',
+    color: 'white',
+    // Ajustes para el texto del encabezado
+    fontSize: 18,  // Tamaño del texto
+    paddingVertical: 8,  // Padding vertical para separación interna
   },
   tableRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    paddingVertical: 5,
+  },
+  tableCell: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 5,
   },
   tableInput: {
-    width: '70%',
-    borderWidth: 1,
-    padding: 10,
+    height: 40,
     borderColor: '#ccc',
+    borderWidth: 1,
+    paddingHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: 'white',
   },
-  checkBox: {
-    alignSelf: 'center',
+  checkboxContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+  },
+  checkboxChecked: {
+    backgroundColor: '#62152D',
   },
   addButton: {
-    marginTop: 20,
+    backgroundColor: '#62152D',
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  addButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  riskHeader: {
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  boxContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  box: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    marginRight: 10,
+  },
+  boxHeader: {
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  boxInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+  },
+  button: {
+    backgroundColor: '#62152D',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
-
-export default RegistroTG;

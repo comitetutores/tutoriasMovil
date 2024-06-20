@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker'; // Importar DateTimePicker
 import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
 
 export default function Planeacion() {
@@ -7,18 +8,11 @@ export default function Planeacion() {
   const [grupo, setGrupo] = useState('');
   const [tutor, setTutor] = useState('');
   const [cuatrimestre, setCuatrimestre] = useState('');
-  const [fecha, setFecha] = useState('');
+  const [fecha, setFecha] = useState(new Date()); // Inicializar fecha con la fecha actual
+  const [showDatePicker, setShowDatePicker] = useState(false); // Estado para controlar la visibilidad del DatePicker
 
   // Datos de la tabla
-  const [tutoriasGrupales, setTutoriasGrupales] = useState([
-    { id: 1, tema: '', semanas: '' },
-    { id: 2, tema: '', semanas: '' },
-    { id: 3, tema: '', semanas: '' },
-    { id: 4, tema: '', semanas: '' },
-    { id: 5, tema: '', semanas: '' },
-    { id: 6, tema: '', semanas: '' },
-  ]);
-
+  const [tutoriasGrupales, setTutoriasGrupales] = useState([{ id: 1, tema: '', semanas: '' }]);
   const [otrasActividades, setOtrasActividades] = useState('');
   const [observaciones, setObservaciones] = useState('');
 
@@ -42,6 +36,17 @@ export default function Planeacion() {
     navigation.navigate('Solicitudes'); // Navegar hacia atrás
   };
 
+  const onChangeFecha = (event, selectedDate) => {
+    const currentDate = selectedDate || fecha;
+    setFecha(currentDate);
+    setShowDatePicker(false); // Ocultar el DatePicker después de seleccionar una fecha
+  };
+
+  const agregarFila = () => {
+    const nuevaFila = { id: tutoriasGrupales.length + 1, tema: '', semanas: '' };
+    setTutoriasGrupales([...tutoriasGrupales, nuevaFila]);
+  };
+
   return (
     <View style={styles.container}>
       {/* Encabezado */}
@@ -52,10 +57,10 @@ export default function Planeacion() {
             style={styles.menuIcon}
           />
         </TouchableOpacity>
-        <Text style={styles.title}>Registro de Tutoría</Text>
+        <Text style={styles.title}>Planeacion Cuatrimestral</Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} stickyHeaderIndices={[0]}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Formulario */}
         <View style={styles.formContainer}>
           <TextInput
@@ -82,25 +87,34 @@ export default function Planeacion() {
             value={cuatrimestre}
             onChangeText={setCuatrimestre}
           />
-          <TextInput
+          <TouchableOpacity
             style={styles.input}
-            placeholder="Fecha de elaboración"
-            value={fecha}
-            onChangeText={setFecha}
-          />
+            onPress={() => setShowDatePicker(true)} // Mostrar DatePicker al presionar este campo
+          >
+            <Text>{fecha.toLocaleDateString()}</Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={fecha}
+              mode="date"
+              display="default"
+              onChange={onChangeFecha}
+              style={styles.datePicker}
+            />
+          )}
         </View>
 
         {/* Tabla de tutorías grupales */}
         <View style={styles.tableContainer}>
           <View style={styles.tableHeader}>
-            <View style={[styles.columnHeader, { backgroundColor: '#000000' }]}>
-              <Text style={[styles.headerText, { color: 'white' }]}>No</Text>
+            <View style={styles.columnHeader}>
+              <Text style={styles.headerText}>No</Text>
             </View>
-            <View style={[styles.columnHeader, { backgroundColor: '#000000' }]}>
-              <Text style={[styles.headerText, { color: 'white' }]}>Tema o Título de la Tutoría Grupal</Text>
+            <View style={[styles.columnHeader, { flex: 2 }]}>
+              <Text style={styles.headerText}>Tema o Título de la Tutoría Grupal</Text>
             </View>
-            <View style={[styles.columnHeader, { backgroundColor: '#000000' }]}>
-              <Text style={[styles.headerText, { color: 'white' }]}>Número de semana programada</Text>
+            <View style={styles.columnHeader}>
+              <Text style={styles.headerText}>Número de semana programada</Text>
             </View>
           </View>
           {tutoriasGrupales.map((item, index) => (
@@ -132,11 +146,14 @@ export default function Planeacion() {
               </View>
             </View>
           ))}
+          <TouchableOpacity style={styles.addButton} onPress={agregarFila}>
+            <Text style={styles.addButtonText}>Agregar fila</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Total de tutorías grupales planeadas */}
         <View style={styles.totalContainer}>
-          <Text>Total de tutorías grupales planeadas: _____</Text>
+          <Text>Total de tutorías grupales planeadas: __________</Text>
         </View>
 
         {/* Cuadros con encabezados */}
@@ -216,6 +233,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     paddingHorizontal: 10,
     borderRadius: 5,
+    justifyContent: 'center',
+  },
+  datePicker: {
+    marginBottom: 10,
   },
   tableContainer: {
     backgroundColor: 'white',
@@ -258,6 +279,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 5,
   },
+  addButton: {
+    backgroundColor: '#62152D',
+    paddingVertical: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  addButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
   totalContainer: {
     backgroundColor: 'white',
     borderRadius: 10,
@@ -294,7 +327,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     textAlignVertical: 'top',
-    top: 33,
+    top: 34,
   },
   button: {
     backgroundColor: '#62152D',
