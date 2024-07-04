@@ -13,6 +13,8 @@ import AyudaScreen from './AyudaScreen';
 import FormularioRTI from './FormularioRTI';
 import FormularioRTIA from './FormularioRTIA';
 import Planeacion from './Planeacion';
+import InformeT from './InformeT';
+
 
 
 const Stack = createStackNavigator();
@@ -33,6 +35,7 @@ export default function App() {
         <Stack.Screen name="FormularioRTIA" component={FormularioRTIA} options={{ headerShown: false }}/>
         <Stack.Screen name="RegistroTG" component={RegistroTG} options={{ headerShown: false }}/>
         <Stack.Screen name="Planeacion" component={Planeacion} options={{ headerShown: false }}/>
+        <Stack.Screen name="InformeT" component={InformeT} options={{ headerShown: false }}/>
 
 
 

@@ -28,7 +28,7 @@ export default function SolicitudesScreen() {
   };
 
   const handleInfoPress = () => {
-
+    navigation.navigate('InformeT');
   };
 
   const handleTutoriaIndividualRegistroPress = () => {
@@ -85,7 +85,7 @@ export default function SolicitudesScreen() {
               style={styles.menuIcon}
             />
           </TouchableOpacity>
-          <Text style={styles.title}>Solicitudes</Text>
+          <Text style={styles.title}>Solicitudes e Historiales</Text>
         </View>
 
 
@@ -121,7 +121,7 @@ export default function SolicitudesScreen() {
                 source={require('./Imagenes/aprobar.png')}
                 style={styles.buttonIcon}
               />
-              <Text style={styles.buttonText}>Tutoria Individual Registro</Text>
+              <Text style={styles.buttonText}>Historial de Tutoria Individual</Text>
             </TouchableOpacity>
           </View>
 
@@ -157,7 +157,7 @@ export default function SolicitudesScreen() {
                 source={require('./Imagenes/listaVF.png')}
                 style={styles.buttonIcon}
               />
-              <Text style={styles.buttonText}>Tutoria Grupal Registro</Text>
+              <Text style={styles.buttonText}>Historial de Tutoria Grupal</Text>
             </TouchableOpacity>
           </View>
 

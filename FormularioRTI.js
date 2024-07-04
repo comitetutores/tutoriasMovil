@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, ScrollView } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
-import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Animated, Dimensions, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-export default function FormularioRTI() {
+const { width } = Dimensions.get('window');
+
+export default function FormularioRTI({ route }) {
   const [nombre, setNombre] = useState('');
   const [apellidoPaterno, setApellidoPaterno] = useState('');
   const [apellidoMaterno, setApellidoMaterno] = useState('');
@@ -12,10 +13,58 @@ export default function FormularioRTI() {
   const [tipoTutoria, setTipoTutoria] = useState('Ninguna');
   const [comentarios, setComentarios] = useState('');
 
-  const navigation = useNavigation(); // Obtener la instancia de navigation
+  const { matriculaUsuario } = route.params;  // Obtener la matrícula desde los parámetros de la ruta
+  const navigation = useNavigation();
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuAnimation] = useState(new Animated.Value(-width));
+
+  useEffect(() => {
+    // Solicitar la información del usuario cuando el componente se monta
+    const fetchUserInfo = async () => {
+      try {
+        const response = await fetch(`http://192.168.3.165:3300/api/usuario/${matriculaUsuario}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          setNombre(data.nombre);
+          setApellidoPaterno(data.apellido_paterno);
+          setApellidoMaterno(data.apellido_materno);
+          setCorreo(data.correo);
+          setMatricula(data.matricula);
+        } else {
+          console.error('Error al obtener la información del usuario:', data.error);
+        }
+      } catch (error) {
+        console.error('Error al conectar con la API:', error);
+      }
+    };
+
+    fetchUserInfo();
+  }, [matriculaUsuario]);
+
+  const toggleMenu = () => {
+    Animated.timing(menuAnimation, {
+      toValue: menuVisible ? -width : 0,
+      duration: 300,
+      useNativeDriver: false,
+    }).start(() => {
+      setMenuVisible(!menuVisible);
+    });
+  };
+
+  const handleInicioPress = () => {
+    navigation.navigate('InicioAlumno');
+  };
+
+  const handleAyudaPress = () => {
+    navigation.navigate('Ayuda');
+  };
+
+  const handleCSPress = () => {
+    navigation.navigate('Login');
+  };
 
   const handleSubmit = () => {
-    // Lógica para manejar el envío del formulario
     console.log({
       nombre,
       apellidoPaterno,
@@ -27,10 +76,6 @@ export default function FormularioRTI() {
     });
   };
 
-  const handleAtras = () => {
-    navigation.navigate('Solicitudes'); // Usar navigation para navegar
-  };
-
   return (
     <ImageBackground
       source={require('./Imagenes/FondoPantalla2.jpg')}
@@ -38,15 +83,14 @@ export default function FormularioRTI() {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        {/* Encabezado */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
+          <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
             <Image
-              source={require('./Imagenes/atras.png')}
+              source={require('./Imagenes/MenuDes.png')}
               style={styles.menuIcon}
             />
           </TouchableOpacity>
-          <Text style={styles.title}>Registro de Tutoría</Text>
+          <Text style={styles.title}>Formulario</Text>
         </View>
         <ScrollView contentContainerStyle={styles.formContainer}>
           <View style={styles.form}>
@@ -54,32 +98,32 @@ export default function FormularioRTI() {
               style={styles.input}
               placeholder="Nombre"
               value={nombre}
-              onChangeText={setNombre}
+              editable={false}  // Campo no editable
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Paterno"
               value={apellidoPaterno}
-              onChangeText={setApellidoPaterno}
+              editable={false}  // Campo no editable
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Materno"
               value={apellidoMaterno}
-              onChangeText={setApellidoMaterno}
+              editable={false}  // Campo no editable
             />
             <TextInput
               style={styles.input}
               placeholder="Correo Electrónico"
               value={correo}
-              onChangeText={setCorreo}
+              editable={false}  // Campo no editable
               keyboardType="email-address"
             />
             <TextInput
               style={styles.input}
               placeholder="Matrícula"
               value={matricula}
-              onChangeText={setMatricula}
+              editable={false}  // Campo no editable
             />
             <View style={styles.pickerContainer}>
               <Picker
@@ -91,7 +135,7 @@ export default function FormularioRTI() {
                 <Picker.Item label="Solicitar Tutoría" value="SolicitarTutoría" />
                 <Picker.Item label="Solicitar Asesoría" value="TutoriaIndividual" />
                 <Picker.Item label="Solicitud de Baja" value="SolicituddeBaja" />
-                <Picker.Item label="Apoyo Información Becas y Trámites" value="ApoyoInformacionBecasyTramites" />
+                <Picker.Item label="Apoyo Informacion Becas y Tramites" value="ApoyoInformacionBecasyTramites" />
                 <Picker.Item label="Apoyo Servicios al Estudiante" value="ApoyoServiciosalEstudiante" />
               </Picker>
             </View>
@@ -108,6 +152,52 @@ export default function FormularioRTI() {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        <Animated.View style={[styles.menuContainer, { left: menuAnimation }]}>
+          <TouchableOpacity style={styles.menuCloseButton} onPress={toggleMenu}>
+            <Image
+              source={require('./Imagenes/MenuDes.png')}
+              style={styles.menuIcon}
+            />
+          </TouchableOpacity>
+          <View style={styles.menuItemsContainer}>
+            <View style={styles.circle}></View>
+            <TouchableOpacity style={styles.menuItem} onPress={handleInicioPress}>
+              <Image
+                source={require('./Imagenes/Inicio.png')}
+                style={styles.menuItemIcon}
+              />
+              <Text style={styles.menuText}>Inicio</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem}>
+              <Image
+                source={require('./Imagenes/mensaje.png')}
+                style={styles.menuItemIcon}
+              />
+              <Text style={styles.menuText}>Mensajes</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem}>
+              <Image
+                source={require('./Imagenes/calendario.png')}
+                style={styles.menuItemIcon}
+              />
+              <Text style={styles.menuText}>Calendario</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={handleAyudaPress}>
+              <Image
+                source={require('./Imagenes/Ayuda.png')}
+                style={styles.menuItemIcon}
+              />
+              <Text style={styles.menuText}>Ayuda</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={handleCSPress}>
+              <Image
+                source={require('./Imagenes/CerrarSesion.png')}
+                style={styles.menuItemIcon}
+              />
+              <Text style={styles.menuText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
       </View>
     </ImageBackground>
   );
@@ -116,86 +206,129 @@ export default function FormularioRTI() {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: 'cover',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
-    backgroundColor: '#62152D',
     width: '100%',
-    height: 70,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 20,
-    position: 'relative',
+    justifyContent: 'flex-start',
+    padding: 16,
+    backgroundColor: '#E86A33',
   },
   menuButton: {
-    position: 'absolute',
-    left: 10,
-    top: 30,
+    marginRight: 16,
   },
   menuIcon: {
-    width: 30,
-    height: 30,
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
   },
   title: {
-    color: 'white',
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#FFFFFF',
   },
   formContainer: {
-    flexGrow: 1,
-    paddingVertical: 20,
-    paddingHorizontal: 30,
-    justifyContent: 'center',
+    padding: 16,
+    alignItems: 'center',
   },
   form: {
-    backgroundColor: 'rgba(255, 255, 255, 1.0)',
-    padding: 20,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    padding: 16,
     elevation: 5,
   },
   input: {
+    width: '100%',
     height: 40,
-    borderColor: '#ccc',
+    borderColor: '#CCCCCC',
     borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
     borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
   },
   pickerContainer: {
-    borderColor: '#ccc',
+    width: '100%',
+    height: 40,
+    borderColor: '#CCCCCC',
     borderWidth: 1,
-    marginBottom: 15,
     borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    justifyContent: 'center',
   },
   picker: {
-    height: 40,
     width: '100%',
+    height: '100%',
   },
   textArea: {
-    height: 100,
+    height: 80,
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#62152D',
-    paddingVertical: 15,
-    borderRadius: 10,
+    backgroundColor: '#58DC96',
+    paddingVertical: 10,
+    borderRadius: 5,
     alignItems: 'center',
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  menuContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: width,
+    backgroundColor: '#FFFFFF',
+    zIndex: 1000,
+    padding: 20,
+  },
+  menuCloseButton: {
+    alignSelf: 'flex-end',
+    marginBottom: 20,
+  },
+  menuItemsContainer: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  circle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#C4C4C4',
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  menuItemIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
+    marginRight: 10,
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#333333',
   },
 });

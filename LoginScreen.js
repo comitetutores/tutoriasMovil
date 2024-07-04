@@ -3,16 +3,45 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 
 export default function LoginScreen({ navigation }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');  // Aquí ingresas la matrícula del usuario
+  const [password, setPassword] = useState('');  // Aquí ingresas la contraseña del usuario
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (username === 'Saul' && password === '123') {
-      navigation.navigate('InicioAlumno');
-    } else if (username === 'Cristi' && password === '12345') {
-      navigation.navigate('Inicio');
-    } else {
-      Alert.alert('Error', 'Usuario o contraseña incorrectos');
+  const handleLogin = async () => {
+    if (!username || !password) {
+      Alert.alert('Error', 'Por favor, completa ambos campos');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://192.168.3.165:3300/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ matricula: username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (data.id_rol === 1) {
+          navigation.navigate('InicioAlumno');  // Redirige a la pantalla de inicio del alumno
+        } else if (data.id_rol === 2) {
+          navigation.navigate('Inicio');  // Redirige a la pantalla de inicio general
+        } else {
+          Alert.alert('Error', 'Rol no reconocido');
+        }
+      } else {
+        Alert.alert('Error', data.error || 'Usuario o contraseña incorrectos');
+      }
+    } catch (error) {
+      console.error('Error al iniciar sesión:', error);
+      Alert.alert('Error', 'No se pudo conectar con el servidor. Por favor, inténtalo más tarde.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -27,23 +56,27 @@ export default function LoginScreen({ navigation }) {
           <Text style={styles.label}>Usuario</Text>
           <TextInput
             style={styles.input}
+            placeholder="Ingresa tu matrícula"
             placeholderTextColor="#D7CDCD"
             value={username}
             onChangeText={setUsername}
+            editable={!loading}
           />
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Contraseña</Text>
           <TextInput
             style={styles.input}
+            placeholder="Ingresa tu contraseña"
             placeholderTextColor="#D7CDCD"
             secureTextEntry={true}
             value={password}
             onChangeText={setPassword}
+            editable={!loading}
           />
         </View>
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Iniciar Sesión</Text>
+        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+          <Text style={styles.buttonText}>{loading ? 'Iniciando...' : 'Iniciar Sesión'}</Text>
         </TouchableOpacity>
       </View>
       <StatusBar style="auto" />

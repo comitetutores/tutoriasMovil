@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image, } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useNavigation } from '@react-navigation/native';
 
@@ -10,9 +10,10 @@ export default function RegistroTG() {
   const [cuatrimestre, setCuatrimestre] = useState('');
   const [fechaSesion, setFechaSesion] = useState(new Date());
   const [tema, setTema] = useState('');
+  const [comentarios, setComentarios] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [alumnos, setAlumnos] = useState([{ id: 1, nombre: '', asistencia: false }]);
-  const [riesgos, setRiesgos] = useState([{ academico: '', personal: '' }]);
+  const [riesgos, setRiesgos] = useState([{ academico: '', personal: '', socioeconomico: '' }]); // Agregar campo socioeconomico
 
   const navigation = useNavigation();
 
@@ -31,7 +32,6 @@ export default function RegistroTG() {
   };
 
   return (
-
     <View style={styles.container}>
       {/* Encabezado */}
       <View style={styles.header}>
@@ -85,6 +85,14 @@ export default function RegistroTG() {
             placeholder="Tema"
             value={tema}
             onChangeText={setTema}
+          />
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="Comentarios"
+            value={comentarios}
+            onChangeText={setComentarios}
+            multiline
+            numberOfLines={4}
           />
         </View>
 
@@ -142,6 +150,9 @@ export default function RegistroTG() {
             <View style={styles.columnHeader}>
               <Text style={styles.headerText}>Personal</Text>
             </View>
+            <View style={styles.columnHeader}>
+              <Text style={styles.headerText}>Socioeconómico</Text>
+            </View>
           </View>
           <View style={styles.tableRow}>
             <View style={styles.tableCell}>
@@ -164,6 +175,18 @@ export default function RegistroTG() {
                 onChangeText={(text) => {
                   const newRiesgos = [...riesgos];
                   newRiesgos[0].personal = text;
+                  setRiesgos(newRiesgos);
+                }}
+              />
+            </View>
+            <View style={styles.tableCell}>
+              <TextInput
+                style={styles.tableInput}
+                placeholder="Número Socioeconómico"
+                value={riesgos[0].socioeconomico}
+                onChangeText={(text) => {
+                  const newRiesgos = [...riesgos];
+                  newRiesgos[0].socioeconomico = text;
                   setRiesgos(newRiesgos);
                 }}
               />
@@ -241,6 +264,10 @@ const styles = StyleSheet.create({
   datePicker: {
     marginBottom: 10,
   },
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
   tableContainer: {
     backgroundColor: 'white',
     borderRadius: 10,
@@ -263,9 +290,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     color: 'white',
-    // Ajustes para el texto del encabezado
-    fontSize: 18,  // Tamaño del texto
-    paddingVertical: 8,  // Padding vertical para separación interna
+    fontSize: 18,
+    paddingVertical: 8,
   },
   tableRow: {
     flexDirection: 'row',
