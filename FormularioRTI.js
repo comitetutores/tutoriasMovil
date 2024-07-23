@@ -1,10 +1,43 @@
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ImageBackground, Animated, Dimensions, ScrollView } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, Animated, Dimensions, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
+import { UserContext } from './UserContext';
 
 const { width } = Dimensions.get('window');
 
-export default function FormularioRTI({ route }) {
+const FormularioRTI = () => {
+  const { user } = useContext(UserContext);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    app: '',
+    apm: '',
+    correo: '',
+    matricula_tutor: ''
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('http://192.168.0.10:3300/api/usuario', {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        });
+        setFormData(response.data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    if (user && user.token) {
+      fetchUserData();
+    }
+  }, [user]);
+
+  const navigation = useNavigation();
+
   const [nombre, setNombre] = useState('');
   const [apellidoPaterno, setApellidoPaterno] = useState('');
   const [apellidoMaterno, setApellidoMaterno] = useState('');
@@ -13,34 +46,8 @@ export default function FormularioRTI({ route }) {
   const [tipoTutoria, setTipoTutoria] = useState('Ninguna');
   const [comentarios, setComentarios] = useState('');
 
-  const { matriculaUsuario } = route.params;  // Obtener la matrícula desde los parámetros de la ruta
-  const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuAnimation] = useState(new Animated.Value(-width));
-
-  useEffect(() => {
-    // Solicitar la información del usuario cuando el componente se monta
-    const fetchUserInfo = async () => {
-      try {
-        const response = await fetch(`http://192.168.3.165:3300/api/usuario/${matriculaUsuario}`);
-        const data = await response.json();
-
-        if (response.ok) {
-          setNombre(data.nombre);
-          setApellidoPaterno(data.apellido_paterno);
-          setApellidoMaterno(data.apellido_materno);
-          setCorreo(data.correo);
-          setMatricula(data.matricula);
-        } else {
-          console.error('Error al obtener la información del usuario:', data.error);
-        }
-      } catch (error) {
-        console.error('Error al conectar con la API:', error);
-      }
-    };
-
-    fetchUserInfo();
-  }, [matriculaUsuario]);
 
   const toggleMenu = () => {
     Animated.timing(menuAnimation, {
@@ -53,7 +60,7 @@ export default function FormularioRTI({ route }) {
   };
 
   const handleInicioPress = () => {
-    navigation.navigate('InicioAlumno');
+    navigation.navigate('Inicio');
   };
 
   const handleAyudaPress = () => {
@@ -62,6 +69,10 @@ export default function FormularioRTI({ route }) {
 
   const handleCSPress = () => {
     navigation.navigate('Login');
+  };
+
+  const handleAtras = () => {
+    navigation.navigate('Solicitudes'); 
   };
 
   const handleSubmit = () => {
@@ -97,33 +108,38 @@ export default function FormularioRTI({ route }) {
             <TextInput
               style={styles.input}
               placeholder="Nombre"
-              value={nombre}
-              editable={false}  // Campo no editable
+              value={formData.nombre}
+              onChangeText={setNombre}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Paterno"
-              value={apellidoPaterno}
-              editable={false}  // Campo no editable
+              value={formData.app}
+              onChangeText={setApellidoPaterno}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Materno"
-              value={apellidoMaterno}
-              editable={false}  // Campo no editable
+              value={formData.apm}
+              onChangeText={setApellidoMaterno}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Correo Electrónico"
-              value={correo}
-              editable={false}  // Campo no editable
+              value={formData.correo}
+              onChangeText={setCorreo}
               keyboardType="email-address"
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Matrícula"
-              value={matricula}
-              editable={false}  // Campo no editable
+              value={formData.matricula_tutor}
+              onChangeText={setMatricula}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <View style={styles.pickerContainer}>
               <Picker
@@ -168,19 +184,19 @@ export default function FormularioRTI({ route }) {
               />
               <Text style={styles.menuText}>Inicio</Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.menuItem} onPress={handleAtras}>
+              <Image
+                source={require('./Imagenes/Solicitudes.png')}
+                style={styles.menuItemIcon}
+              />
+              <Text style={styles.menuText}>Solicitudes</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem}>
               <Image
                 source={require('./Imagenes/mensaje.png')}
                 style={styles.menuItemIcon}
               />
               <Text style={styles.menuText}>Mensajes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Image
-                source={require('./Imagenes/calendario.png')}
-                style={styles.menuItemIcon}
-              />
-              <Text style={styles.menuText}>Calendario</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem} onPress={handleAyudaPress}>
               <Image
@@ -201,134 +217,149 @@ export default function FormularioRTI({ route }) {
       </View>
     </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    resizeMode: 'cover',
   },
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   header: {
+    backgroundColor: '#62152D',
     width: '100%',
+    height: 70,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    padding: 16,
-    backgroundColor: '#E86A33',
+    justifyContent: 'center',
+    paddingTop: 20,
+    position: 'relative',
   },
   menuButton: {
-    marginRight: 16,
+    position: 'absolute',
+    left: 10,
+    top: 30,
   },
   menuIcon: {
-    width: 40,
-    height: 40,
-    resizeMode: 'contain',
+    width: 30,
+    height: 30,
   },
   title: {
-    fontSize: 24,
+    color: 'white',
+    fontSize: 22,
     fontWeight: 'bold',
-    color: '#FFFFFF',
   },
   formContainer: {
-    padding: 16,
-    alignItems: 'center',
+    flexGrow: 1,
+    paddingVertical: 20,
+    paddingHorizontal: 30,
+    justifyContent: 'center',
   },
   form: {
-    width: '100%',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: 'rgba(255, 255, 255, 1.0)',
+    padding: 20,
     borderRadius: 10,
-    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
     elevation: 5,
   },
   input: {
-    width: '100%',
     height: 40,
-    borderColor: '#CCCCCC',
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
+    marginBottom: 15,
     paddingHorizontal: 10,
-    marginBottom: 10,
+    borderRadius: 5,
   },
   pickerContainer: {
-    width: '100%',
-    height: 40,
-    borderColor: '#CCCCCC',
+    borderColor: '#ccc',
     borderWidth: 1,
+    marginBottom: 15,
     borderRadius: 5,
-    paddingHorizontal: 10,
-    marginBottom: 10,
-    justifyContent: 'center',
   },
   picker: {
+    height: 40,
     width: '100%',
-    height: '100%',
   },
   textArea: {
-    height: 80,
+    height: 100,
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#58DC96',
-    paddingVertical: 10,
-    borderRadius: 5,
+    backgroundColor: '#62152D',
+    paddingVertical: 15,
+    borderRadius: 10,
     alignItems: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   menuContainer: {
     position: 'absolute',
     top: 0,
-    bottom: 0,
-    width: width,
-    backgroundColor: '#FFFFFF',
-    zIndex: 1000,
+    left: 0,
+    width: width * 0.75,
+    height: '100%',
+    backgroundColor: '#4F1124',
     padding: 20,
+    zIndex: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 2,
+    elevation: 5,
   },
   menuCloseButton: {
-    alignSelf: 'flex-end',
-    marginBottom: 20,
+    position: 'absolute',
+    top: 30,
+    right: 10,
   },
   menuItemsContainer: {
-    flex: 1,
-    alignItems: 'flex-start',
+    marginTop: 280,
   },
   circle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#C4C4C4',
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'white',
     alignSelf: 'center',
-    marginBottom: 20,
+    marginBottom: -150,
+    top: -200,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 15,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
   },
   menuItemIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-    marginRight: 10,
+    width: 24,
+    height: 24,
+    marginRight: 15,
   },
   menuText: {
-    fontSize: 16,
-    color: '#333333',
+    fontSize: 18,
+    color: 'white',
+  },
+  menuBottomItem: {
+    position: 'absolute',
+    left: 20,
+    right: 20,
+    bottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
+
+export default FormularioRTI;

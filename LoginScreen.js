@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
+import { UserContext } from './UserContext';
 
 export default function LoginScreen({ navigation }) {
-  const [username, setUsername] = useState('');  // Aquí ingresas la matrícula del usuario
-  const [password, setPassword] = useState('');  // Aquí ingresas la contraseña del usuario
+  const { setUser } = useContext(UserContext);
+  const [username, setUsername] = useState('');  
+  const [password, setPassword] = useState('');  
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -16,7 +18,7 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
 
     try {
-      const response = await fetch('http://192.168.3.165:3300/api/login', {
+      const response = await fetch('http://192.168.0.10:3300/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,10 +29,11 @@ export default function LoginScreen({ navigation }) {
       const data = await response.json();
 
       if (response.ok) {
+        setUser(data);  
         if (data.id_rol === 1) {
-          navigation.navigate('InicioAlumno');  // Redirige a la pantalla de inicio del alumno
+          navigation.navigate('InicioAlumno');  
         } else if (data.id_rol === 2) {
-          navigation.navigate('Inicio');  // Redirige a la pantalla de inicio general
+          navigation.navigate('Inicio');  
         } else {
           Alert.alert('Error', 'Rol no reconocido');
         }

@@ -1,11 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, Animated, Dimensions, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
+import axios from 'axios';
+import { UserContext } from './UserContext';
 
 const { width } = Dimensions.get('window');
 
-export default function FormularioRTI() {
+const FormularioRTIA = () => {
+  const { user } = useContext(UserContext);
+  const [formData, setFormData] = useState({
+    nombre: '',
+    app: '',
+    apm: '',
+    correo: '',
+    matricula: ''
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('http://192.168.0.10:3300/api/usuario', {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        });
+        setFormData(response.data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    if (user && user.token) {
+      fetchUserData();
+    }
+  }, [user]);
+
+  const navigation = useNavigation();
+
   const [nombre, setNombre] = useState('');
   const [apellidoPaterno, setApellidoPaterno] = useState('');
   const [apellidoMaterno, setApellidoMaterno] = useState('');
@@ -16,7 +48,6 @@ export default function FormularioRTI() {
 
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuAnimation] = useState(new Animated.Value(-width));
-  const navigation = useNavigation();
 
   const toggleMenu = () => {
     Animated.timing(menuAnimation, {
@@ -73,33 +104,38 @@ export default function FormularioRTI() {
             <TextInput
               style={styles.input}
               placeholder="Nombre"
-              value={nombre}
+              value={formData.nombre}
               onChangeText={setNombre}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Paterno"
-              value={apellidoPaterno}
+              value={formData.app}
               onChangeText={setApellidoPaterno}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Materno"
-              value={apellidoMaterno}
+              value={formData.apm}
               onChangeText={setApellidoMaterno}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Correo Electrónico"
-              value={correo}
+              value={formData.correo}
               onChangeText={setCorreo}
               keyboardType="email-address"
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <TextInput
               style={styles.input}
               placeholder="Matrícula"
-              value={matricula}
+              value={formData.matricula}
               onChangeText={setMatricula}
+              editable={false} // No editable si obtienes el valor del usuario
             />
             <View style={styles.pickerContainer}>
               <Picker
@@ -151,13 +187,6 @@ export default function FormularioRTI() {
               />
               <Text style={styles.menuText}>Mensajes</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Image
-                source={require('./Imagenes/calendario.png')}
-                style={styles.menuItemIcon}
-              />
-              <Text style={styles.menuText}>Calendario</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.menuItem} onPress={handleAyudaPress}>
               <Image
                 source={require('./Imagenes/Ayuda.png')}
@@ -165,13 +194,11 @@ export default function FormularioRTI() {
               />
               <Text style={styles.menuText}>Ayuda</Text>
             </TouchableOpacity>
-          </View>
-          <View style={[styles.menuBottomItem, { bottom: 20 }]}>
-            <Image
-              source={require('./Imagenes/CerrarSesion.png')}
-              style={styles.menuItemIcon}
-            />
-            <TouchableOpacity onPress={handleCSPress}>
+            <TouchableOpacity style={styles.menuItem} onPress={handleCSPress}>
+              <Image
+                source={require('./Imagenes/CerrarSesion.png')}
+                style={styles.menuItemIcon}
+              />
               <Text style={styles.menuText}>Cerrar Sesión</Text>
             </TouchableOpacity>
           </View>
@@ -179,7 +206,7 @@ export default function FormularioRTI() {
       </View>
     </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
   background: {
@@ -323,3 +350,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 });
+
+export default FormularioRTIA;
