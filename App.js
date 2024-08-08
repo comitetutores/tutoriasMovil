@@ -9,6 +9,7 @@ import RegistroTG from './RegistroTG';
 import SolicitudA from './SolicitudA';
 import SolicitudAR from './SolicitudAR';
 import SolicitudB from './SolicitudB';
+import SolicitudesP from './SolicitudesP';
 import AyudaScreen from './AyudaScreen';
 import FormularioRTI from './FormularioRTI';
 import FormularioRTIA from './FormularioRTIA';
@@ -30,6 +31,7 @@ export default function App() {
           <Stack.Screen name="SolicitudA" component={SolicitudA} options={{ headerShown: false }}/>
           <Stack.Screen name="SolicitudAR" component={SolicitudAR} options={{ headerShown: false }}/>
           <Stack.Screen name="SolicitudB" component={SolicitudB} options={{ headerShown: false }}/>
+          <Stack.Screen name="SolicitudesP" component={SolicitudesP} options={{ headerShown: false }}/>
           <Stack.Screen name="Ayuda" component={AyudaScreen} options={{ headerShown: false }}/>
           <Stack.Screen name="FormularioRTI" component={FormularioRTI} options={{ headerShown: false }}/>
           <Stack.Screen name="FormularioRTIA" component={FormularioRTIA} options={{ headerShown: false }}/>

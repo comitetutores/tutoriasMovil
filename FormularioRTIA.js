@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, Animated, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, Animated, Dimensions, ScrollView, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
@@ -35,6 +35,7 @@ const FormularioRTIA = () => {
       fetchUserData();
     }
   }, [user]);
+  
 
   const navigation = useNavigation();
 
@@ -71,17 +72,48 @@ const FormularioRTIA = () => {
     navigation.navigate('Login');
   };
 
-  const handleSubmit = () => {
-    console.log({
-      nombre,
-      apellidoPaterno,
-      apellidoMaterno,
-      correo,
-      matricula,
-      tipoTutoria,
-      comentarios,
-    });
+  const handleSubmit = async () => {
+      // Verificar si el tipo de tutoría es "Ninguna"
+  if (tipoTutoria === 'Ninguna') {
+    alert('Por favor, seleccione una opción válida en Asesoría.');
+    return;
+  }
+
+    try {
+      const response = await axios.post('http://192.168.0.10:3300/api/registro-tutoria', {
+        matricula: formData.matricula,
+        nombre_alumno: formData.nombre,
+        app: formData.app,
+        apm: formData.apm,
+        correo_alumno: formData.correo,
+        asesoria: tipoTutoria,
+        comentarios: comentarios,
+      }, {
+        headers: {
+          Authorization: `Bearer ${user.token}`
+        }
+      });
+  
+      // Mostrar mensaje de éxito
+      Alert.alert('Éxito', 'El registro fue exitoso', [{ text: 'OK' }]);
+      
+      // Opcional: Puedes limpiar los campos del formulario o redirigir al usuario aquí
+      setNombre('');
+      setApellidoPaterno('');
+      setApellidoMaterno('');
+      setCorreo('');
+      setMatricula('');
+      setTipoTutoria('Ninguna');
+      setComentarios('');
+  
+    } catch (error) {
+      console.error('Error al guardar el registro:', error);
+      // Mostrar mensaje de error
+      Alert.alert('Error', 'Hubo un problema al guardar el registro. Inténtalo de nuevo más tarde.', [{ text: 'OK' }]);
+    }
   };
+  
+  
 
   return (
     <ImageBackground
@@ -99,6 +131,7 @@ const FormularioRTIA = () => {
           </TouchableOpacity>
           <Text style={styles.title}>Formulario</Text>
         </View>
+        
         <ScrollView contentContainerStyle={styles.formContainer}>
           <View style={styles.form}>
             <TextInput
@@ -164,6 +197,7 @@ const FormularioRTIA = () => {
             </TouchableOpacity>
           </View>
         </ScrollView>
+        
         <Animated.View style={[styles.menuContainer, { left: menuAnimation }]}>
           <TouchableOpacity style={styles.menuCloseButton} onPress={toggleMenu}>
             <Image

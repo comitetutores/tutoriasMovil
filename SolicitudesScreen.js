@@ -59,6 +59,10 @@ export default function SolicitudesScreen() {
     navigation.navigate('Solicitudes');
   };
 
+  const handleSolicitudesPendientesPress = () => {
+    navigation.navigate('SolicitudesP');
+  }
+
   const handleInicioPress = () => {
     navigation.navigate('Inicio');
   };
@@ -88,7 +92,6 @@ export default function SolicitudesScreen() {
           <Text style={styles.title}>Solicitudes e Historiales</Text>
         </View>
 
-
         <View style={styles.content}>
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.button} onPress={handlePlaneacionPress}>
@@ -107,7 +110,6 @@ export default function SolicitudesScreen() {
             </TouchableOpacity>
           </View>
 
-
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.button} onPress={handleInfoPress}>
               <Image 
@@ -124,7 +126,6 @@ export default function SolicitudesScreen() {
               <Text style={styles.buttonText}>Historial de Tutoria Individual</Text>
             </TouchableOpacity>
           </View>
-
 
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.button} onPress={handleSolicitudAsesoriaPress}>
@@ -143,7 +144,6 @@ export default function SolicitudesScreen() {
             </TouchableOpacity>
           </View>
 
-
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.button} onPress={handleAccionRemedialPress}>
               <Image 
@@ -161,7 +161,6 @@ export default function SolicitudesScreen() {
             </TouchableOpacity>
           </View>
 
-
           <View style={styles.buttonRow}>
             <TouchableOpacity style={styles.button} onPress={handleFormatoBajaPress}>
               <Image 
@@ -170,9 +169,15 @@ export default function SolicitudesScreen() {
               />
               <Text style={styles.buttonText}>Solicitud de Baja </Text>
             </TouchableOpacity>
+            <TouchableOpacity style={styles.button}  onPress={handleSolicitudesPendientesPress}>
+              <Image 
+                source={require('./Imagenes/listaSL.png')} 
+                style={styles.buttonIcon}
+              />
+              <Text style={styles.buttonText}>Solicitudes Pendientes</Text>
+            </TouchableOpacity>
           </View>
         </View>
-
 
         <Animated.View style={[styles.menuContainer, { left: menuAnimation }]}>
           <TouchableOpacity style={styles.menuCloseButton} onPress={toggleMenu}>

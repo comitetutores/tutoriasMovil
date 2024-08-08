@@ -1,220 +1,247 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, Animated, Dimensions, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Image, ImageBackground, Dimensions, ScrollView, Alert, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Picker } from '@react-native-picker/picker';
 import axios from 'axios';
-import { UserContext } from './UserContext';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { UserContext } from './UserContext'; // Asegúrate de importar tu contexto de usuario
 
 const { width } = Dimensions.get('window');
 
 const FormularioRTI = () => {
-  const { user } = useContext(UserContext);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    app: '',
-    apm: '',
-    correo: '',
-    matricula_tutor: ''
-  });
+  const navigation = useNavigation();
+  const { user } = useContext(UserContext); // Obtener el usuario del contexto
+
+  const [fecha, setFecha] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const [nombreAlumno, setNombreAlumno] = useState('');
+  const [matricula, setMatricula] = useState('');
+  const [carrera, setCarrera] = useState('');
+  const [tutor, setTutor] = useState('');
+  const [grupo, setGrupo] = useState('');
+  const [temasTratados, setTemasTratados] = useState('');
+  const [tendenciaAcademica, setTendenciaAcademica] = useState('');
+  const [metasAcuerdos, setMetasAcuerdos] = useState('');
+  const [apoyoTramite, setApoyoTramite] = useState('');
+  const [herramientasDiagnostico, setHerramientasDiagnostico] = useState('');
+  const [comentarios, setComentarios] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://192.168.0.10:3300/api/usuario', {
+        const response = await axios.get('http://192.168.0.10:3300/api/formulario', {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
         });
-        setFormData(response.data);
+        
+        const data = response.data;
+  
+        // Datos del tutor (persona que inició sesión)
+        setTutor(data.nombre_tutor || '');
+        setGrupo(data.grupo_tutor || '');
+
+        // Datos del alumno con matrícula 5122180007
+        setNombreAlumno(data.nombre_alumno || '');
+        setMatricula(data.matricula_alumno || '');
+        setCarrera(data.carrera_alumno || '');
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error('Error al obtener datos del usuario:', error);
+        Alert.alert('Error', 'No se pudo obtener los datos del usuario.');
       }
     };
-
+  
     if (user && user.token) {
       fetchUserData();
     }
   }, [user]);
 
-  const navigation = useNavigation();
-
-  const [nombre, setNombre] = useState('');
-  const [apellidoPaterno, setApellidoPaterno] = useState('');
-  const [apellidoMaterno, setApellidoMaterno] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [matricula, setMatricula] = useState('');
-  const [tipoTutoria, setTipoTutoria] = useState('Ninguna');
-  const [comentarios, setComentarios] = useState('');
-
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [menuAnimation] = useState(new Animated.Value(-width));
-
-  const toggleMenu = () => {
-    Animated.timing(menuAnimation, {
-      toValue: menuVisible ? -width : 0,
-      duration: 300,
-      useNativeDriver: false,
-    }).start(() => {
-      setMenuVisible(!menuVisible);
-    });
-  };
-
-  const handleInicioPress = () => {
-    navigation.navigate('Inicio');
-  };
-
-  const handleAyudaPress = () => {
-    navigation.navigate('Ayuda');
-  };
-
-  const handleCSPress = () => {
-    navigation.navigate('Login');
-  };
-
   const handleAtras = () => {
     navigation.navigate('Solicitudes'); 
   };
 
-  const handleSubmit = () => {
-    console.log({
-      nombre,
-      apellidoPaterno,
-      apellidoMaterno,
-      correo,
+  const handleRegistrar = () => {
+    console.log('Registrando información:', {
+      fecha,
+      nombreAlumno,
       matricula,
-      tipoTutoria,
+      carrera,
+      tutor,
+      grupo,
+      temasTratados,
+      tendenciaAcademica,
+      metasAcuerdos,
+      apoyoTramite,
+      herramientasDiagnostico,
       comentarios,
     });
+    Alert.alert('Registro exitoso', 'La información se ha registrado correctamente.');
   };
 
+  const showDatepicker = () => {
+    setShowDatePicker(true);
+  };
+
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || fecha;
+    setShowDatePicker(Platform.OS === 'ios');
+    setFecha(currentDate);
+  };
+  
   return (
     <ImageBackground
       source={require('./Imagenes/FondoPantalla2.jpg')}
       style={styles.background}
     >
       <View style={styles.overlay} />
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-            <Image
-              source={require('./Imagenes/MenuDes.png')}
-              style={styles.menuIcon}
-            />
-          </TouchableOpacity>
-          <Text style={styles.title}>Formulario</Text>
-        </View>
-        <ScrollView contentContainerStyle={styles.formContainer}>
-          <View style={styles.form}>
+
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
+          <Image 
+            source={require('./Imagenes/atras.png')}
+            style={styles.menuIcon}
+          />
+        </TouchableOpacity>
+        <Text style={styles.title}>Formulario</Text>
+      </View>
+
+      <ScrollView style={styles.container}>
+        <View style={styles.formContainer}>
+          <View style={styles.formContainer2}>
+            <TouchableOpacity onPress={showDatepicker}>
+              <Text style={styles.input}>{fecha.toLocaleDateString()}</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={fecha}
+                mode="date"
+                display="default"
+                onChange={onChange}
+              />
+            )}
             <TextInput
               style={styles.input}
-              placeholder="Nombre"
-              value={formData.nombre}
-              onChangeText={setNombre}
-              editable={false} // No editable si obtienes el valor del usuario
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Apellido Paterno"
-              value={formData.app}
-              onChangeText={setApellidoPaterno}
-              editable={false} // No editable si obtienes el valor del usuario
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Apellido Materno"
-              value={formData.apm}
-              onChangeText={setApellidoMaterno}
-              editable={false} // No editable si obtienes el valor del usuario
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Correo Electrónico"
-              value={formData.correo}
-              onChangeText={setCorreo}
-              keyboardType="email-address"
-              editable={false} // No editable si obtienes el valor del usuario
+              placeholder="Nombre del alumno"
+              value={nombreAlumno}
+              editable={false} // Campos no editables
             />
             <TextInput
               style={styles.input}
               placeholder="Matrícula"
-              value={formData.matricula_tutor}
-              onChangeText={setMatricula}
-              editable={false} // No editable si obtienes el valor del usuario
+              value={matricula}
+              editable={false} // Campos no editables
             />
+            <TextInput
+              style={styles.input}
+              placeholder="Carrera"
+              value={carrera}
+              editable={false} // Campos no editables
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Tutor"
+              value={tutor}
+              editable={false} // Campos no editables
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Grupo"
+              value={grupo}
+              editable={false} // Campos no editables
+            />
+          </View>
+
+          <View style={styles.form}>
             <View style={styles.pickerContainer}>
+              <Text style={styles.sectionTitle}>Temas Tratados</Text>
               <Picker
-                selectedValue={tipoTutoria}
+                selectedValue={temasTratados}
+                onValueChange={(itemValue) => setTemasTratados(itemValue)}
                 style={styles.picker}
-                onValueChange={(itemValue) => setTipoTutoria(itemValue)}
               >
-                <Picker.Item label="Ninguna" value="Ninguna" />
-                <Picker.Item label="Solicitar Tutoría" value="SolicitarTutoría" />
-                <Picker.Item label="Solicitar Asesoría" value="TutoriaIndividual" />
-                <Picker.Item label="Solicitud de Baja" value="SolicituddeBaja" />
-                <Picker.Item label="Apoyo Informacion Becas y Tramites" value="ApoyoInformacionBecasyTramites" />
-                <Picker.Item label="Apoyo Servicios al Estudiante" value="ApoyoServiciosalEstudiante" />
+                <Picker.Item label="Seleccione una opción" value="" />
+                <Picker.Item label="Entrevista inicial" value="Entrevista inicial" />
+                <Picker.Item label="Autoevaluación de tendencia académica" value="Autoevaluación de tendencia académica" />
+                <Picker.Item label="Detección de hábitos de estudios" value="Detección de hábitos de estudios" />
+                <Picker.Item label="Apoyo para tramite" value="Apoyo para tramite" />
+                <Picker.Item label="Metas y acuerdos" value="Metas y acuerdos" />
+                <Picker.Item label="Detección de necesidades Baja escolar no académica" value="Detección de necesidades Baja escolar no académica" />
               </Picker>
             </View>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Comentarios"
-              value={comentarios}
-              onChangeText={setComentarios}
-              multiline
-              numberOfLines={4}
-            />
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-              <Text style={styles.buttonText}>Registrar</Text>
-            </TouchableOpacity>
+
+            <View style={styles.pickerContainer}>
+              <Text style={styles.sectionTitle}>Tendencia académica</Text>
+              <Picker
+                selectedValue={tendenciaAcademica}
+                onValueChange={(itemValue) => setTendenciaAcademica(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Seleccione una opción" value="" />
+                <Picker.Item label="Se anexa impresión UTZYN" value="Se anexa impresión UTZYN" />
+                <Picker.Item label="Anexar formato de tendencia académica" value="Anexar formato de tendencia académica" />
+                <Picker.Item label="El alumno tiene problemas en las materias" value="El alumno tiene problemas en las materias" />
+              </Picker>
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <Text style={styles.sectionTitle}>Metas y Acuerdos</Text>
+              <Picker
+                selectedValue={metasAcuerdos}
+                onValueChange={(itemValue) => setMetasAcuerdos(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Seleccione una opción" value="" />
+                <Picker.Item label="Metas establecidas a corto plazo" value="Metas establecidas a corto plazo" />
+                <Picker.Item label="Metas establecidas a largo plazo" value="Metas establecidas a largo plazo" />
+              </Picker>
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <Text style={styles.sectionTitle}>Apoyo a trámites</Text>
+              <Picker
+                selectedValue={apoyoTramite}
+                onValueChange={(itemValue) => setApoyoTramite(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Seleccione una opción" value="" />
+                <Picker.Item label="Baja temporal" value="Baja temporal" />
+                <Picker.Item label="Baja definitiva" value="Baja definitiva" />
+                <Picker.Item label="Reingreso" value="Reingreso" />
+              </Picker>
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <Text style={styles.sectionTitle}>Herramientas de Diagnóstico de Habilidades de Estudio</Text>
+              <Picker
+                selectedValue={herramientasDiagnostico}
+                onValueChange={(itemValue) => setHerramientasDiagnostico(itemValue)}
+                style={styles.picker}
+              >
+                <Picker.Item label="Seleccione una opción" value="" />
+                <Picker.Item label="Examen diagnóstico de matemáticas" value="Examen diagnóstico de matemáticas" />
+                <Picker.Item label="Examen diagnóstico de lecto-escritura" value="Examen diagnóstico de lecto-escritura" />
+              </Picker>
+            </View>
+
+            <View style={styles.textAreaContainer}>
+              <Text style={styles.sectionTitle}>Comentarios adicionales</Text>
+              <TextInput
+                style={styles.textArea}
+                placeholder="Escribe aquí tus comentarios"
+                value={comentarios}
+                onChangeText={setComentarios}
+                multiline={true}
+                numberOfLines={4}
+              />
+            </View>
           </View>
-        </ScrollView>
-        <Animated.View style={[styles.menuContainer, { left: menuAnimation }]}>
-          <TouchableOpacity style={styles.menuCloseButton} onPress={toggleMenu}>
-            <Image
-              source={require('./Imagenes/MenuDes.png')}
-              style={styles.menuIcon}
-            />
+
+          <TouchableOpacity style={styles.submitButton} onPress={handleRegistrar}>
+            <Text style={styles.submitButtonText}>Registrar</Text>
           </TouchableOpacity>
-          <View style={styles.menuItemsContainer}>
-            <View style={styles.circle}></View>
-            <TouchableOpacity style={styles.menuItem} onPress={handleInicioPress}>
-              <Image
-                source={require('./Imagenes/Inicio.png')}
-                style={styles.menuItemIcon}
-              />
-              <Text style={styles.menuText}>Inicio</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={handleAtras}>
-              <Image
-                source={require('./Imagenes/Solicitudes.png')}
-                style={styles.menuItemIcon}
-              />
-              <Text style={styles.menuText}>Solicitudes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem}>
-              <Image
-                source={require('./Imagenes/mensaje.png')}
-                style={styles.menuItemIcon}
-              />
-              <Text style={styles.menuText}>Mensajes</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={handleAyudaPress}>
-              <Image
-                source={require('./Imagenes/Ayuda.png')}
-                style={styles.menuItemIcon}
-              />
-              <Text style={styles.menuText}>Ayuda</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.menuItem} onPress={handleCSPress}>
-              <Image
-                source={require('./Imagenes/CerrarSesion.png')}
-                style={styles.menuItemIcon}
-              />
-              <Text style={styles.menuText}>Cerrar Sesión</Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </View>
+        </View>
+      </ScrollView>
     </ImageBackground>
   );
 };
@@ -241,6 +268,16 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     position: 'relative',
   },
+  form: {
+    backgroundColor: 'rgba(255, 255, 255, 1.0)',
+    padding: 20,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
   menuButton: {
     position: 'absolute',
     left: 10,
@@ -253,55 +290,6 @@ const styles = StyleSheet.create({
   title: {
     color: 'white',
     fontSize: 22,
-    fontWeight: 'bold',
-  },
-  formContainer: {
-    flexGrow: 1,
-    paddingVertical: 20,
-    paddingHorizontal: 30,
-    justifyContent: 'center',
-  },
-  form: {
-    backgroundColor: 'rgba(255, 255, 255, 1.0)',
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 15,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  pickerContainer: {
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 15,
-    borderRadius: 5,
-  },
-  picker: {
-    height: 40,
-    width: '100%',
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  button: {
-    backgroundColor: '#62152D',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
     fontWeight: 'bold',
   },
   menuContainer: {
@@ -352,13 +340,88 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: 'white',
   },
-  menuBottomItem: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    bottom: 20,
-    flexDirection: 'row',
+  formContainer: {
+    padding: 20,
+  },
+  formContainer2: {
+    backgroundColor: 'white',
+    padding: 20,
+    marginBottom: 20,
+    borderRadius: 10,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: 'white',
+  },
+  input2: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: 'white',
+    top: 20,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  pickerContainer: {
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 15,
+    borderRadius: 5,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    backgroundColor: '#ccc',
+    padding: 5,
+    textAlign: 'center',
+  },
+  picker: {
+    height: 50,
+    width: '100%',
+  },
+  button: {
+    backgroundColor: '#62152D',
+    padding: 15,
+    borderRadius: 5,
     alignItems: 'center',
+    top: 30,
+  },
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+  },
+  input3: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+  comentariosInput: {
+    height: 120,
+  },
+  button2: {
+    backgroundColor: '#62152D',
+    padding: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 20, // Ajuste adicional para el botón
+  },
+
+  buttonText2: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
 
