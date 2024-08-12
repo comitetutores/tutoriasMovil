@@ -177,8 +177,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginTop: 200,
     marginBottom: 50,
-    height: 340,  // Establecer una altura específica para reducir la altura vertical
-    // Eliminar flex: 1 para evitar que se expanda verticalmente
+    height: 340, 
   },
   logo: {
     width: 150,
@@ -226,7 +225,7 @@ const styles = StyleSheet.create({
     right: 10,
   },
   menuItemsContainer: {
-    marginTop: 280, // Ajusta según sea necesario para más espacio vertical
+    marginTop: 280, 
   },
   circle: {
     width: 200,
@@ -258,8 +257,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 70, // Ajustar según sea necesario
-    left: 15, // Ajustar según sea necesario
+    bottom: 70, 
+    left: 15, 
     width: '100%',
   },
 });

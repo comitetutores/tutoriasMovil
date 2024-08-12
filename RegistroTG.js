@@ -13,7 +13,7 @@ export default function RegistroTG() {
   const [comentarios, setComentarios] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [alumnos, setAlumnos] = useState([{ id: 1, nombre: '', asistencia: false }]);
-  const [riesgos, setRiesgos] = useState([{ academico: '', personal: '', socioeconomico: '' }]); // Agregar campo socioeconomico
+  const [riesgos, setRiesgos] = useState([{ academico: '', personal: '', socioeconomico: '' }]); 
 
   const navigation = useNavigation();
 
@@ -33,7 +33,7 @@ export default function RegistroTG() {
 
   return (
     <View style={styles.container}>
-      {/* Encabezado */}
+
       <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
           <Image 
@@ -45,7 +45,7 @@ export default function RegistroTG() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Formulario */}
+
         <View style={styles.formContainer}>
           <TextInput
             style={styles.input}
@@ -96,7 +96,7 @@ export default function RegistroTG() {
           />
         </View>
 
-        {/* Tabla de Alumnos */}
+
         <View style={styles.tableContainer}>
           <View style={styles.tableHeader}>
             <View style={[styles.columnHeader, { flex: 2 }]}>
@@ -140,7 +140,7 @@ export default function RegistroTG() {
           </TouchableOpacity>
         </View>
 
-        {/* Tabla de Riesgos */}
+
         <View style={styles.tableContainer}>
           <Text style={styles.riskHeader}>Total de alumnos que se detectaron en riesgo:</Text>
           <View style={styles.tableHeader}>
@@ -194,7 +194,6 @@ export default function RegistroTG() {
           </View>
         </View>
 
-        {/* Cuadros de Totales */}
         <View style={styles.boxContainer}>
           <View style={styles.box}>
             <Text style={styles.boxHeader}>Total de alumnos que asistieron:</Text>
@@ -206,7 +205,6 @@ export default function RegistroTG() {
           </View>
         </View>
 
-        {/* Botón de enviar */}
         <TouchableOpacity style={styles.button} onPress={() => console.log('Enviar')}>
           <Text style={styles.buttonText}>Enviar</Text>
         </TouchableOpacity>

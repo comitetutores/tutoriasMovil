@@ -1,26 +1,52 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Importar DateTimePicker
-import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, ScrollView, Image, Alert } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios'; 
+import { UserContext } from './UserContext'; 
 
 export default function Planeacion() {
+  const { user } = useContext(UserContext);
   const [carrera, setCarrera] = useState('');
   const [grupo, setGrupo] = useState('');
   const [tutor, setTutor] = useState('');
   const [cuatrimestre, setCuatrimestre] = useState('');
-  const [fecha, setFecha] = useState(new Date()); // Inicializar fecha con la fecha actual
-  const [showDatePicker, setShowDatePicker] = useState(false); // Estado para controlar la visibilidad del DatePicker
+  const [fecha, setFecha] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
-  // Datos de la tabla
   const [tutoriasGrupales, setTutoriasGrupales] = useState([{ id: 1, tema: '', semanas: '' }]);
   const [otrasActividades, setOtrasActividades] = useState('');
   const [observaciones, setObservaciones] = useState('');
+  const [totalTutorias, setTotalTutorias] = useState(1);  
 
-  const navigation = useNavigation(); // Obtener la instancia de navigation
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await axios.get('http://192.168.3.212:3300/api/planeacion', {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        });
+        
+        const data = response.data;
+        setCarrera(data.carrera || '');
+        setGrupo(data.grupo_tutor || '');
+        setTutor(data.nombre_tutor || '');
+      } catch (error) {
+        console.error('Error al obtener datos del usuario:', error);
+        Alert.alert('Error', 'No se pudo obtener los datos del usuario.');
+      }
+    };
+
+    if (user && user.token) {
+      fetchUserData();
+    }
+  }, [user]);
 
   const handleSubmit = () => {
-    // Lógica para manejar el envío de los datos del formulario
-    console.log({
+    console.log('Registrando información:', {
       carrera,
       grupo,
       tutor,
@@ -30,26 +56,37 @@ export default function Planeacion() {
       otrasActividades,
       observaciones,
     });
+    Alert.alert('Registro exitoso', 'La información se ha registrado correctamente.');
   };
 
   const handleAtras = () => {
-    navigation.navigate('Solicitudes'); // Navegar hacia atrás
+    navigation.navigate('Solicitudes');
   };
 
   const onChangeFecha = (event, selectedDate) => {
     const currentDate = selectedDate || fecha;
     setFecha(currentDate);
-    setShowDatePicker(false); // Ocultar el DatePicker después de seleccionar una fecha
+    setShowDatePicker(false);
   };
 
   const agregarFila = () => {
     const nuevaFila = { id: tutoriasGrupales.length + 1, tema: '', semanas: '' };
     setTutoriasGrupales([...tutoriasGrupales, nuevaFila]);
+    setTotalTutorias(totalTutorias + 1);  
+  };
+
+  const borrarUltimaFila = () => {
+    if (tutoriasGrupales.length > 1) {
+      setTutoriasGrupales(tutoriasGrupales.slice(0, -1));
+      setTotalTutorias(totalTutorias - 1); 
+    } else {
+      Alert.alert('Advertencia', 'Debe haber al menos una fila en la tabla.');
+    }
   };
 
   return (
     <View style={styles.container}>
-      {/* Encabezado */}
+
       <View style={styles.header}>
         <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
           <Image 
@@ -61,35 +98,39 @@ export default function Planeacion() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Formulario */}
+
         <View style={styles.formContainer}>
           <TextInput
             style={styles.input}
             placeholder="Carrera"
             value={carrera}
             onChangeText={setCarrera}
+            editable={false} 
           />
           <TextInput
             style={styles.input}
             placeholder="Grupo"
             value={grupo}
             onChangeText={setGrupo}
+            editable={false} 
           />
           <TextInput
             style={styles.input}
             placeholder="Tutor"
             value={tutor}
             onChangeText={setTutor}
+            editable={false} 
           />
           <TextInput
             style={styles.input}
             placeholder="Cuatrimestre"
             value={cuatrimestre}
             onChangeText={setCuatrimestre}
+            editable={false} 
           />
           <TouchableOpacity
             style={styles.input}
-            onPress={() => setShowDatePicker(true)} // Mostrar DatePicker al presionar este campo
+            onPress={() => setShowDatePicker(true)}
           >
             <Text>{fecha.toLocaleDateString()}</Text>
           </TouchableOpacity>
@@ -104,7 +145,7 @@ export default function Planeacion() {
           )}
         </View>
 
-        {/* Tabla de tutorías grupales */}
+
         <View style={styles.tableContainer}>
           <View style={styles.tableHeader}>
             <View style={styles.columnHeader}>
@@ -149,14 +190,17 @@ export default function Planeacion() {
           <TouchableOpacity style={styles.addButton} onPress={agregarFila}>
             <Text style={styles.addButtonText}>Agregar fila</Text>
           </TouchableOpacity>
+          <TouchableOpacity style={styles.addButton} onPress={borrarUltimaFila}>
+            <Text style={styles.addButtonText}>Borrar última fila</Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Total de tutorías grupales planeadas */}
+
         <View style={styles.totalContainer}>
-          <Text>Total de tutorías grupales planeadas: __________</Text>
+          <Text>Total de tutorías grupales planeadas: {totalTutorias}</Text>
         </View>
 
-        {/* Cuadros con encabezados */}
+
         <View style={styles.boxContainer}>
           <View style={styles.box}>
             <Text style={styles.boxHeader}>Otras actividades planeadas en materia de tutorías:</Text>
@@ -180,7 +224,7 @@ export default function Planeacion() {
           </View>
         </View>
 
-        {/* Botón de enviar */}
+
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Enviar</Text>
         </TouchableOpacity>
@@ -192,7 +236,7 @@ export default function Planeacion() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#990634', // Color de fondo actualizado
+    backgroundColor: '#990634', 
   },
   header: {
     backgroundColor: '#62152D',
@@ -254,12 +298,12 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#000000', // Color de fondo del encabezado de la tabla
+    backgroundColor: '#000000', 
   },
   headerText: {
     fontWeight: 'bold',
     textAlign: 'center',
-    color: 'white', // Color del texto del encabezado de la tabla
+    color: 'white', 
   },
   tableRow: {
     flexDirection: 'row',

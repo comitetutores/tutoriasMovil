@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Linking, ScrollView, ImageBackground } from 'react-native';
-import { useNavigation } from '@react-navigation/native';  // Importar useNavigation
+import { useNavigation } from '@react-navigation/native';  
 
 export default function SolicitudAR() {
-  const navigation = useNavigation();  // Obtener la instancia de navigation
+  const navigation = useNavigation();  
 
   const handleAtras = () => {
-    navigation.navigate('Solicitudes');  // Usar navigation para navegar
+    navigation.navigate('Solicitudes');  
   };
 
   return (
@@ -16,7 +16,7 @@ export default function SolicitudAR() {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        {/* Encabezado */}
+      
         <View style={styles.header}>
           <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
             <Image 
@@ -52,8 +52,9 @@ export default function SolicitudAR() {
             </View>
 
             <View style={styles.linkContainer}>
-              <TouchableOpacity onPress={() => Linking.openURL('https://www.youtube.com/watch?v=YzmKpxxjY6k')}>
-                <Text style={styles.linkText}>https://www.youtube.com/watch?v=YzmKpxxjY6k</Text>
+              <TouchableOpacity onPress={() => Linking.openURL('https://drive.google.com/file/d/17tmKP0rMSfHWHytxzfsKBxC0q2sy-lh9/view?usp=drive_link')}>
+                <Text style={styles.linkText}>https://drive.google.com/file/d/17tmKP0rMSfHWHytxzfsKBxC0q2sy-lh9/view?usp=drive_link
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 5,
     elevation: 5,
-    marginTop: 50,  // Ajuste para bajar el whiteBox
+    marginTop: 50,  
   },
   titleContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',

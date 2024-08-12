@@ -30,7 +30,7 @@ const FormularioRTI = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://192.168.0.10:3300/api/formulario', {
+        const response = await axios.get('http://192.168.3.212:3300/api/formulario', {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -38,11 +38,9 @@ const FormularioRTI = () => {
         
         const data = response.data;
   
-        // Datos del tutor (persona que inició sesión)
         setTutor(data.nombre_tutor || '');
         setGrupo(data.grupo_tutor || '');
 
-        // Datos del alumno con matrícula 5122180007
         setNombreAlumno(data.nombre_alumno || '');
         setMatricula(data.matricula_alumno || '');
         setCarrera(data.carrera_alumno || '');
@@ -124,31 +122,31 @@ const FormularioRTI = () => {
               style={styles.input}
               placeholder="Nombre del alumno"
               value={nombreAlumno}
-              editable={false} // Campos no editables
+              editable={false} 
             />
             <TextInput
               style={styles.input}
               placeholder="Matrícula"
               value={matricula}
-              editable={false} // Campos no editables
+              editable={false} 
             />
             <TextInput
               style={styles.input}
               placeholder="Carrera"
               value={carrera}
-              editable={false} // Campos no editables
+              editable={false} 
             />
             <TextInput
               style={styles.input}
               placeholder="Tutor"
               value={tutor}
-              editable={false} // Campos no editables
+              editable={false} 
             />
             <TextInput
               style={styles.input}
               placeholder="Grupo"
               value={grupo}
-              editable={false} // Campos no editables
+              editable={false} 
             />
           </View>
 
@@ -237,8 +235,8 @@ const FormularioRTI = () => {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleRegistrar}>
-            <Text style={styles.submitButtonText}>Registrar</Text>
+          <TouchableOpacity style={styles.button2} onPress={handleRegistrar}>
+            <Text style={styles.buttonText2}>Registrar</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

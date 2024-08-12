@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, Image, TouchableOpacity, Linking, ScrollView, ImageBackground } from 'react-native';
-import { useNavigation } from '@react-navigation/native';  // Importar useNavigation
+import { useNavigation } from '@react-navigation/native';  
 
 export default function SolicitudA() {
-  const navigation = useNavigation();  // Obtener la instancia de navigation
+  const navigation = useNavigation();  
 
   const handleAtras = () => {
-    navigation.navigate('Solicitudes');  // Usar navigation para navegar
+    navigation.navigate('Solicitudes');  
   };
 
   return (
@@ -16,7 +16,7 @@ export default function SolicitudA() {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        {/* Encabezado */}
+
         <View style={styles.header}>
           <TouchableOpacity style={styles.menuButton} onPress={handleAtras}>
             <Image 
@@ -50,8 +50,8 @@ export default function SolicitudA() {
             </View>
 
             <View style={styles.linkContainer}>
-              <TouchableOpacity onPress={() => Linking.openURL('https://www.youtube.com/watch?v=YzmKpxxjY6k')}>
-                <Text style={styles.linkText}>https://www.youtube.com/watch?v=YzmKpxxjY6k</Text>
+              <TouchableOpacity onPress={() => Linking.openURL('https://drive.google.com/file/d/17zUjVHLuR9PlTCrZt2RuM9XVAGoOUTYI/view?usp=drive_link ')}>
+                <Text style={styles.linkText}>https://drive.google.com/file/d/17zUjVHLuR9PlTCrZt2RuM9XVAGoOUTYI/view?usp=drive_link </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.8,
     shadowRadius: 5,
     elevation: 5,
-    marginTop: 50,  // Ajuste para bajar el whiteBox
+    marginTop: 50,  
   },
   titleContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
@@ -137,7 +137,7 @@ const styles = StyleSheet.create({
   },
   instructionText: {
     fontSize: 16,
-    color: '#000000', // Cambiado a negro
+    color: '#000000', 
     textAlign: 'center',
     marginBottom: 20,
     paddingHorizontal: 10,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: 'bold',
-    color: '#4F1124', // Color del texto "SOLICITUD DE ASESORÍA"
+    color: '#4F1124', 
   },
   imageContainer: {
     flexDirection: 'row',

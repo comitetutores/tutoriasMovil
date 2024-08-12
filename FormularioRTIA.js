@@ -20,7 +20,7 @@ const FormularioRTIA = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://192.168.0.10:3300/api/usuario', {
+        const response = await axios.get('http://192.168.3.212:3300/api/usuario', {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -73,14 +73,14 @@ const FormularioRTIA = () => {
   };
 
   const handleSubmit = async () => {
-      // Verificar si el tipo de tutoría es "Ninguna"
-  if (tipoTutoria === 'Ninguna') {
+
+    if (tipoTutoria === 'Ninguna') {
     alert('Por favor, seleccione una opción válida en Asesoría.');
     return;
   }
 
     try {
-      const response = await axios.post('http://192.168.0.10:3300/api/registro-tutoria', {
+      const response = await axios.post('http://192.168.3.212:3300/api/registro-tutoria', {
         matricula: formData.matricula,
         nombre_alumno: formData.nombre,
         app: formData.app,
@@ -94,10 +94,8 @@ const FormularioRTIA = () => {
         }
       });
   
-      // Mostrar mensaje de éxito
       Alert.alert('Éxito', 'El registro fue exitoso', [{ text: 'OK' }]);
       
-      // Opcional: Puedes limpiar los campos del formulario o redirigir al usuario aquí
       setNombre('');
       setApellidoPaterno('');
       setApellidoMaterno('');
@@ -108,7 +106,7 @@ const FormularioRTIA = () => {
   
     } catch (error) {
       console.error('Error al guardar el registro:', error);
-      // Mostrar mensaje de error
+
       Alert.alert('Error', 'Hubo un problema al guardar el registro. Inténtalo de nuevo más tarde.', [{ text: 'OK' }]);
     }
   };
@@ -139,21 +137,21 @@ const FormularioRTIA = () => {
               placeholder="Nombre"
               value={formData.nombre}
               onChangeText={setNombre}
-              editable={false} // No editable si obtienes el valor del usuario
+              editable={false} 
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Paterno"
               value={formData.app}
               onChangeText={setApellidoPaterno}
-              editable={false} // No editable si obtienes el valor del usuario
+              editable={false} 
             />
             <TextInput
               style={styles.input}
               placeholder="Apellido Materno"
               value={formData.apm}
               onChangeText={setApellidoMaterno}
-              editable={false} // No editable si obtienes el valor del usuario
+              editable={false} 
             />
             <TextInput
               style={styles.input}
@@ -161,14 +159,14 @@ const FormularioRTIA = () => {
               value={formData.correo}
               onChangeText={setCorreo}
               keyboardType="email-address"
-              editable={false} // No editable si obtienes el valor del usuario
+              editable={false} 
             />
             <TextInput
               style={styles.input}
               placeholder="Matrícula"
               value={formData.matricula}
               onChangeText={setMatricula}
-              editable={false} // No editable si obtienes el valor del usuario
+              editable={false} 
             />
             <View style={styles.pickerContainer}>
               <Picker

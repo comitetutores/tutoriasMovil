@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   content: {
-    top: -10, //subir o bajar TODOS los botones a la vez
+    top: -10, 
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
     right: 10,
   },
   menuItemsContainer: {
-    marginTop: 300, // Ajusta según sea necesario para más espacio vertical
+    marginTop: 300, 
   },
   menuItem: {
     flexDirection: 'row',
@@ -350,8 +350,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
-    bottom: 70, // Ajustar según sea necesario
-    left: 15, // Ajustar según sea necesario
+    bottom: 70, 
+    left: 15, 
     width: '100%',
   },
   circle: {

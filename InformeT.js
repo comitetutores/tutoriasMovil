@@ -25,12 +25,11 @@ export default function InformeT() {
 
   return (
     <ScrollView style={styles.container}>
-      {/* Encabezado */}
+
       <View style={styles.header}>
         <Text style={styles.headerText}>TUTORÍAS GRUPALES</Text>
       </View>
 
-      {/* Formulario */}
       <View style={styles.formContainer}>
         <TextInput
           style={styles.input}
@@ -70,7 +69,7 @@ export default function InformeT() {
         />
       </View>
 
-      {/* Tabla de Tutorías Programadas */}
+
       <View style={styles.tableContainer}>
         <Text style={styles.sectionHeader}>Programadas en la planeación</Text>
         <View style={styles.tableHeader}>
@@ -116,7 +115,6 @@ export default function InformeT() {
         ))}
       </View>
 
-      {/* Tabla de Tutorías No Programadas */}
       <View style={styles.tableContainer}>
         <Text style={styles.sectionHeader}>Tutorías no programadas en la planeación</Text>
         <View style={styles.tableHeader}>
