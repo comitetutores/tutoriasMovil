@@ -30,7 +30,7 @@ const FormularioRTI = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://192.168.3.212:3300/api/formulario', {
+        const response = await axios.get('http://192.168.0.10:3300/api/formulario', {
           headers: {
             Authorization: `Bearer ${user.token}`
           }

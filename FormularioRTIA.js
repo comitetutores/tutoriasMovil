@@ -20,7 +20,7 @@ const FormularioRTIA = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://192.168.3.212:3300/api/usuario', {
+        const response = await axios.get('http://192.168.0.10:3300/api/usuario', {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
@@ -80,7 +80,7 @@ const FormularioRTIA = () => {
   }
 
     try {
-      const response = await axios.post('http://192.168.3.212:3300/api/registro-tutoria', {
+      const response = await axios.post('http://192.168.0.10:3300/api/registro-tutoria', {
         matricula: formData.matricula,
         nombre_alumno: formData.nombre,
         app: formData.app,

@@ -24,7 +24,7 @@ export default function Planeacion() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get('http://192.168.3.212:3300/api/planeacion', {
+        const response = await axios.get('http://192.168.0.10:3300/api/planeacion', {
           headers: {
             Authorization: `Bearer ${user.token}`
           }
